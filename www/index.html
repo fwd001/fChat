@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="author" content="Wayou">
+  <meta name="description" content="hichat | a simple chat application built with node.js and websocket">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>hichat</title>
+  <link rel="stylesheet" href="./styles/bootstrap.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+  <div class="wrapper">
+    <div class="contentBox" id="contentBox"></div>
+    <div class="sendBox">
+      <textarea class="form-control" id="Textarea" rows="3"></textarea>
+
+      <button type="button" id="sendBtn" class="btn btn-primary">send message</button>
+    </div>
+  </div>
+  <script src="./scripts/jquery.min.js"></script>
+  <script src="./scripts/bootstrap.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="scripts/script.js"></script>
+  <script>
+    $(function() {
+      const socket = io.connect()
+      const _contentBox = $('#contentBox')
+      const _textarea = $('#Textarea')
+      const _send = $('#sendBtn')
+
+      var sendMessage = function () {
+        socket.emit('send message', _textarea.val())
+        _textarea.val('').focus()
+      }
+      _send.on('click', sendMessage)
+      socket.on('new message', function (data) {
+        const div = $('<div>'+data.msg+'</div>')
+        _contentBox.append(div)
+      })
+    })
+    
+  </script>
+
+  </script>
+</body>
+
+</html>
