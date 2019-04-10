@@ -5,46 +5,131 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="author" content="Wayou">
-  <meta name="description" content="hichat | a simple chat application built with node.js and websocket">
+  <meta name="description" content="chat">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hichat</title>
+  <title>chat</title>
   <link rel="stylesheet" href="./styles/bootstrap.css">
   <link rel="stylesheet" href="styles/main.css">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 
 <body>
   <div class="wrapper">
-    <div class="contentBox" id="contentBox"></div>
+    <div><span class="onLine">--</span>人在线</div>
+    <div class="contentBox" id="contentBox">
+      <div>
+        <!-- <span class="chatName">name</span>
+        <span class="chatDate">(<span></span>):</span>
+        <span class="chatContent">asdfasdf</span> -->
+      </div>
+    </div>
     <div class="sendBox">
       <textarea class="form-control" id="Textarea" rows="3"></textarea>
-
-      <button type="button" id="sendBtn" class="btn btn-primary">send message</button>
+      <button type="button" id="sendBtn" class="btn btn-primary">发送</button>
+    </div>
+  </div>
+  <!-- 输入名字 -->
+  <div id="loginWrapper">
+    <p id="info">正在连接服务器中...</p>
+    <div id="nickWrapper">
+      <input type="text" placeHolder="昵称" id="nicknameInput" class="form-control" />
+      <button id="loginBtn" class="btn btn-primary">OK</button>
     </div>
   </div>
   <script src="./scripts/jquery.min.js"></script>
   <script src="./scripts/bootstrap.js"></script>
+  <script src="./scripts/axios.js"></script>
+  <script src="./scripts/moment.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="scripts/script.js"></script>
   <script>
-    $(function() {
+    $(function () {
       const socket = io.connect()
       const _contentBox = $('#contentBox')
       const _textarea = $('#Textarea')
       const _send = $('#sendBtn')
-
-      var sendMessage = function () {
-        socket.emit('send message', _textarea.val())
+      const _ok = $('#loginBtn')
+      const _nameInput = $('#nicknameInput')
+      const _online = $('.onLine')
+      let _name = ''
+      
+      // 发送消息
+      const _sendMessage = function () {
+        const _msg = _textarea.val()
+        const _sendData = {
+          msg: _msg,
+          name: _name
+        }
+        if (_msg) {
+          socket.emit('send message', _sendData)
+        }
         _textarea.val('').focus()
+        axios.get('/test').then(res => {
+          console.log(res)
+        })
       }
-      _send.on('click', sendMessage)
-      socket.on('new message', function (data) {
-        const div = $('<div>'+data.msg+'</div>')
-        _contentBox.append(div)
+      // send输入框按键事件
+      const _textareaKeydown = function (e) {
+        if (e.keyCode === 13 && (e.ctrlKey || e.metaKey)) {
+          this.value += "\n";
+        } else if (e.keyCode === 13) {
+          e.preventDefault();
+          _send.click()
+        }
+      }
+      const _enterleave = function(name, type, date) {
+        _contentBox.append(`<div>
+            <span class="system">系统</span>
+            <span class="chatDate">(${date}):</span>
+            <span class="system">${name} ${type}</span>
+          </div>`)
+      }
+      _ok.on('click', function () {
+        const _n = _nameInput.val()
+        if (_n) {
+          _name = _n
+          socket.emit('login', _n)
+        } else {
+          $('#info').text('请填写昵称！')
+        }
+
       })
+      _send.on('click', _sendMessage)
+      _nameInput.on('keydown', function(e) {
+        if (e.keyCode === 13) {
+          e.preventDefault();
+          _ok.click()
+        }
+      })
+      _textarea.on('keydown', _textareaKeydown)
+      socket.on('new message', function (data) {
+        console.log(data);
+        console.log(moment(data.date).format('YYYY-MM-DD HH:mm:ss'));
+        const date = moment(data.date).format('HH:mm')
+        const _div = $(`<div>
+            <span class="chatName">${data.name}</span>
+            <span class="chatDate">(${date}):</span>
+            <span class="chatContent">${data.msg}</span>
+          </div>`)
+        _contentBox.append(_div)
+        _contentBox.scrollTop(_contentBox[0].scrollHeight);
+      })
+      socket.on('nickExisted', function () {
+        $('#info').text('昵称已存在，请选择其他昵称')
+      });
+      socket.on('loginSuccess', function () {
+        document.title = 'chat | ' + _name;
+        $('#loginWrapper').hide()
+        _textarea.focus()
+      });
+      socket.on('system', function (name, userCount, type) {
+        var msg = type == 'login' ? '进入' : ' 离开'
+        _online.text(userCount)
+        const date = moment(new Date).format('HH:mm')
+        _enterleave(name, msg, date)
+      });
+
     })
-    
   </script>
 
   </script>
