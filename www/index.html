@@ -18,14 +18,18 @@
     <div><span class="onLine">--</span>人在线</div>
     <div class="contentBox" id="contentBox">
       <div>
-        <!-- <span class="chatName">name</span>
-        <span class="chatDate">(<span></span>):</span>
-        <span class="chatContent">asdfasdf</span> -->
       </div>
     </div>
     <div style="margin-top: 10px;">
       <button id="fileBtn">文件</button>
       <input style="display: none;" type="file" name="file" id="file">
+      <input id="colorStyle" type="color" placeHolder='#000' title="文字颜色" />
+      <div class="progress" id="progress" style="display: none">
+        <div class="progress-bar" id="myModal_add_progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+          aria-valuenow="0" style="width:0;">
+        </div>
+        <!-- <span class="schedule">0.00%</span> -->
+      </div>
     </div>
     <div class="sendBox">
       <textarea class="form-control" id="Textarea" rows="3"></textarea>
@@ -47,10 +51,25 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="scripts/script.js"></script>
   <script>
+    axios.create({
+      withCredentials: true,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      onUploadProgress: p => {
+        return 100 * (p.loaded / p.total)
+      },
+      onDownloadProgress: p => {
+        return 100 * (p.loaded / p.total)
+      }
+    })
     $(function () {
       const socket = io.connect()
       const _contentBox = $('#contentBox')
       const _textarea = $('#Textarea')
+      const _color = $('#colorStyle')
+      const _progress = $('#progress')
+      
       const _send = $('#sendBtn')
       const _ok = $('#loginBtn')
       const _nameInput = $('#nicknameInput')
@@ -63,9 +82,11 @@
       // 发送消息
       const _sendMessage = function () {
         const _msg = _textarea.val()
+        // console.log(_color);
         const _sendData = {
           msg: _msg,
-          name: _name
+          name: _name,
+          color: _color.val()
         }
         if (_msg) {
           socket.emit('send message', _sendData)
@@ -85,7 +106,7 @@
         }
       }
       const _enterleave = function (name, type, date) {
-        _contentBox.append(`<div>
+        _contentBox.append(`<div  class='chatBox'>
             <span class="system">系统</span>
             <span class="chatDate">(${date}):</span>
             <span class="system">${name} ${type}</span>
@@ -110,31 +131,65 @@
       })
       _textarea.on('keydown', _textareaKeydown)
       _fileBtn.on('click', function () {
+        $("#myModal_add_progressBar").css("width",0)
         _file.click()
       })
       _file.on('change', function () {
-        console.log(this.files);
+        // console.log(this.files);
         let formData = new FormData()
+        if(!this.files[0]) return 
+        $(_progress).show()
         let temp = this.files[0]
         if (temp) {
           formData.append('file', temp)
           axios({
             method: 'post',
             url: '/test',
-            data: formData
+            data: formData,
+            onUploadProgress(p) {
+              var point = p.loaded / p.total
+              var percent = Number(point * 100).toFixed(2)
+              percent += "%"
+              // $('.schedule').text(percent)
+              $("#myModal_add_progressBar").css("width",percent)
+            },
+            onDownloadProgress(p) {
+              // console.log(p)
+            }
           }).then(res => {
-            console.log(res);
+            // console.log(res)
+            const params = {
+              name: _name,
+              fileName: ''
+            }
+            socket.emit('up file', params)
+            _file.val('')
+            setTimeout(() => {
+              $(_progress).fadeOut(1000)
+            }, 1000);
           })
         }
+      })
+      // 有文件上传完成提示
+      socket.on('fup file', function (data) {
+        const date = moment(data.date).format('HH:mm')
+        const downName = data.newFileName.split('***')[1]
+        const _div = $(`<div class='chatBox'>
+            <span class="chatName">${data.name}</span>
+            <span class="chatDate">(${date}):</span>
+            <span class="chatContent"><a class="btn btn-link btn-sm" href="/download?name=${data.newFileName}" target="_blank">(点击下载)${downName}</a></span>
+          </div>`)
+        _contentBox.append(_div)
+        _contentBox.scrollTop(_contentBox[0].scrollHeight);
       })
       socket.on('new message', function (data) {
         // console.log(data);
         // console.log(moment(data.date).format('YYYY-MM-DD HH:mm:ss'));
         const date = moment(data.date).format('HH:mm')
-        const _div = $(`<div>
+        const _div = $(`<div class='chatBox'>
             <span class="chatName">${data.name}</span>
             <span class="chatDate">(${date}):</span>
-            <span class="chatContent">${data.msg}</span>
+            <span class="chatContent" style="color: ${data.color}">${data.msg}</span>
           </div>`)
         _contentBox.append(_div)
         _contentBox.scrollTop(_contentBox[0].scrollHeight);

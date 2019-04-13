@@ -54,15 +54,37 @@ html, body {
     margin-left: 20px;
     float: left;
 }
+.chatBox {
+    overflow: hidden;
+}
+.chatBox span {
+    line-height: 31px;
+}
 .chatDate {
+    float: left;
     font-size: 12px;
     color: #ccc;
 }
 .chatName {
+    float: left;
+    max-width: 70px;
     font-size: 14px;
     color: #333;
+}
+.chatContent {
+    float: left;
 }
 .system {
     color: #f40;
     font-size: 14px;
-} 
+    float: left;
+}
+#fileBtn {
+    margin-bottom: 5px;
+}
+
+span {
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}

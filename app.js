@@ -1,9 +1,16 @@
 const express = require('express')
+const fs = require('fs')
+const path = require('path')
 const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io').listen(server) //引入socket.io模块并绑定到服务器
 const router = require('./router')
 let users = []
+
+global.newFileName = ''
+
+const {getJsonFiles} = require('./tool')
+
 
 app.use('/', express.static(__dirname + '/www'))
 
@@ -30,15 +37,16 @@ io.sockets.on('connection', function(socket) {
   // 用户登陆
   socket.on('login', function(nickname) {
     if (users.indexOf(nickname) > -1) {
-        socket.emit('nickExisted');
+      socket.emit('nickExisted')
     } else {
-        //socket.userIndex = users.length;
-        socket.nickname = nickname;
-        users.push(nickname);
-        socket.emit('loginSuccess');
-        io.sockets.emit('system', nickname, users.length, 'login');
-    };
-});
+      //socket.userIndex = users.length;
+      socket.nickname = nickname
+      users.push(nickname)
+      socket.emit('loginSuccess')
+      io.sockets.emit('system', nickname, users.length, 'login')
+    }
+  })
+
   //接收并处理客户端发送的foo事件
   socket.on('send message', function(data) {
     //将消息输出到控制台
@@ -48,5 +56,15 @@ io.sockets.on('connection', function(socket) {
       date
     }
     io.sockets.emit('new message', response)
+  })
+
+  // 上传文件出发
+  socket.on('up file', function(data) {
+    //将消息输出到控制台
+    const params = {
+      ...data,
+      newFileName
+    }
+    io.sockets.emit('fup file', params)
   })
 })
