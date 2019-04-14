@@ -1,8 +1,9 @@
 var router = require('express').Router()
 const multer = require('multer')
 const fs = require('fs')
+const {getJsonFiles} = require('./tool')
 
-const uploadFolder = 'upload/'
+const uploadFolder = 'uploads/'
 // 通过 filename 属性定制
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -20,12 +21,13 @@ var upload = multer({ storage: storage })
 
 //获取所有的新闻接口：
 //localhost:9999/getNewsList : 可以获取到所有的新闻
-router.get('/test', function(req, res) {
+router.get('/fileList', function(req, res) {
+  const list = getJsonFiles()
   //获取到所有的新闻的数据，把数据响应给浏览器
   res.send({
     code: 200,
     msg: '成功！',
-    data: '22222'
+    data: list
   })
 })
 router.post('/test', upload.single('file'), function(req, res, next) {
@@ -40,7 +42,7 @@ router.get('/download', function(req, res, next) {
   const downName = name.split('***')[1]
   // console.log(downName);
   //第二种方式
-  var path = `./upload/${name}`
+  var path = `./uploads/${name}`
   var f = fs.createReadStream(path)
 
   res.writeHead(200, {

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./styles/bootstrap.css">
+  <link rel="stylesheet" href="styles/box.css">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <title>箱……</title>
+</head>
+
+<body>
+  <div class="fileBox container row">
+    <a href="#" class="btn btn-link btn-sm col-xl-2 col-lg-3 col-md-4 col-sm-6">qwewqeqwe</a>
+  </div>
+
+  <script src="./scripts/jquery.min.js"></script>
+  <script src="./scripts/bootstrap.js"></script>
+  <script src="./scripts/axios.js"></script>
+  <script src="./scripts/moment.js"></script>
+  <script>
+    axios.get('/fileList').then(res => {
+      // console.log(res);
+      let links = ''
+      res.data.data.forEach(v => {
+        const date = moment(v.date).format('YYYY-MM-DD HH:mm:ss')
+        // console.log(date);
+        links += `<a href="/download?name=${v.downName}" title="${date}-${v.name}" target="_blank" class="btn btn-link btn-sm col-xl-2 col-lg-3 col-md-4 col-sm-6">${v.name}</a>`
+      });
+      $('.fileBox').html(links)
+    })
+  </script>
+</body>
+
+</html>

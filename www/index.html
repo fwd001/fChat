@@ -24,6 +24,7 @@
       <button id="fileBtn">文件</button>
       <input style="display: none;" type="file" name="file" id="file">
       <input id="colorStyle" type="color" placeHolder='#000' title="文字颜色" />
+      <a href="/fileManage.html" class="btn btn-link btn-sm">文件箱</a>
       <div class="progress" id="progress" style="display: none">
         <div class="progress-bar" id="myModal_add_progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
           aria-valuenow="0" style="width:0;">
@@ -51,6 +52,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="scripts/script.js"></script>
   <script>
+    // axios初始化配置
     axios.create({
       withCredentials: true,
       headers: {
@@ -92,9 +94,6 @@
           socket.emit('send message', _sendData)
         }
         _textarea.val('').focus()
-        axios.get('/test').then(res => {
-          console.log(res)
-        })
       }
       // send输入框按键事件
       const _textareaKeydown = function (e) {

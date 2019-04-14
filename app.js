@@ -1,6 +1,4 @@
 const express = require('express')
-const fs = require('fs')
-const path = require('path')
 const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io').listen(server) //引入socket.io模块并绑定到服务器
@@ -9,9 +7,7 @@ let users = []
 
 global.newFileName = ''
 
-const {getJsonFiles} = require('./tool')
-
-
+// 处理静态资源
 app.use('/', express.static(__dirname + '/www'))
 
 //中间件,我整个服务器的接口全部允许跨域
@@ -47,7 +43,7 @@ io.sockets.on('connection', function(socket) {
     }
   })
 
-  //接收并处理客户端发送的foo事件
+  //接收并处理客户端发送的事件
   socket.on('send message', function(data) {
     //将消息输出到控制台
     const date = new Date()
