@@ -35,6 +35,7 @@ router.post('/test', upload.single('file'), function(req, res, next) {
   let file = req.file
   // console.log(file.filename)
   newFileName = file.filename
+  
   res.json({ message: 'ok' })
 })
 

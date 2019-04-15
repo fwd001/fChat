@@ -71,7 +71,7 @@
       const _textarea = $('#Textarea')
       const _color = $('#colorStyle')
       const _progress = $('#progress')
-      
+
       const _send = $('#sendBtn')
       const _ok = $('#loginBtn')
       const _nameInput = $('#nicknameInput')
@@ -130,14 +130,15 @@
       })
       _textarea.on('keydown', _textareaKeydown)
       _fileBtn.on('click', function () {
-        $("#myModal_add_progressBar").css("width",0)
+        $(this).attr('disabled', true)
+        $("#myModal_add_progressBar").css("width", 0)
         _file.click()
       })
       // inputChange上传事件
       _file.on('change', function () {
         // console.log(this.files);
         let formData = new FormData()
-        if(!this.files[0]) return 
+        if (!this.files[0]) return
         $(_progress).show()
         let temp = this.files[0]
         if (temp) {
@@ -151,7 +152,7 @@
               var point = p.loaded / p.total
               var percent = Number(point * 100).toFixed(2)
               percent += "%"
-              $("#myModal_add_progressBar").css("width",percent)
+              $("#myModal_add_progressBar").css("width", percent)
             },
             onDownloadProgress(p) {
               // console.log(p)
@@ -165,6 +166,9 @@
             _file.val('')
             setTimeout(() => {
               $(_progress).fadeOut(1000)
+              setTimeout(() => {
+                _fileBtn.removeAttr('disabled')
+              }, 1000);
             }, 1000);
           })
         }
