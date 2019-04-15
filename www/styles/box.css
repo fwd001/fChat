@@ -1,3 +1,6 @@
+.fileBox {
+  margin: 0 auto;
+}
 .fileBox a {
   overflow:hidden;
   white-space:nowrap;

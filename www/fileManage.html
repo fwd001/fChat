@@ -13,7 +13,20 @@
 
 <body>
   <div class="fileBox container row">
-    <a href="#" class="btn btn-link btn-sm col-xl-2 col-lg-3 col-md-4 col-sm-6">qwewqeqwe</a>
+    <!-- <a href="#" class="btn btn-link btn-sm col-xl-2 col-lg-3 col-md-4 col-sm-6">qwewqeqwe</a> -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">名称</th>
+          <th scope="col">时间</th>
+          <th scope="col">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+
+      </tbody>
+    </table>
   </div>
 
   <script src="./scripts/jquery.min.js"></script>
@@ -21,15 +34,37 @@
   <script src="./scripts/axios.js"></script>
   <script src="./scripts/moment.js"></script>
   <script>
-    axios.get('/fileList').then(res => {
-      // console.log(res);
-      let links = ''
-      res.data.data.forEach(v => {
-        const date = moment(v.date).format('YYYY-MM-DD HH:mm:ss')
-        // console.log(date);
-        links += `<a href="/download?name=${v.downName}" title="${date}-${v.name}" target="_blank" class="btn btn-link btn-sm col-xl-2 col-lg-3 col-md-4 col-sm-6">${v.name}</a>`
-      });
-      $('.fileBox').html(links)
+    const getList = () => {
+      axios.get('/fileList').then(res => {
+        let links = ''
+        res.data.data.forEach((v, i) => {
+          const date = moment(v.date).format('YYYY-MM-DD HH:mm:ss')
+          // links += `<a href="/download?name=${v.downName}" target="_blank" class="btn btn-link btn-sm">${v.name}</a>`
+          links += `<tr>
+            <th scope="row">${i + 1}</th>
+            <td>${v.name}</td>
+            <td>${date}</td>
+            <td>
+              <a href="/download?name=${v.downName}" target="_blank" class="btn btn-link btn-sm">下载</a>
+              <button data-name="${v.downName}" class="del btn btn-link btn-sm">删除</button>
+            </td>
+          </tr>`
+        });
+        $('.fileBox tbody').html(links)
+      })
+    }
+
+    getList()
+    $('.fileBox').on('click', '.del', function () {
+      const name = $(this).data('name')
+      axios.get(`/del?name=${name}`).then(res => {
+        console.log(res);
+        if (res.data.code === 200) {
+          getList()
+        } else {
+          alert(res.data.msg)
+        }
+      })
     })
   </script>
 </body>

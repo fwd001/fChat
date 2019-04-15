@@ -133,6 +133,7 @@
         $("#myModal_add_progressBar").css("width",0)
         _file.click()
       })
+      // inputChange上传事件
       _file.on('change', function () {
         // console.log(this.files);
         let formData = new FormData()
@@ -145,18 +146,17 @@
             method: 'post',
             url: '/test',
             data: formData,
+            // 上传进度
             onUploadProgress(p) {
               var point = p.loaded / p.total
               var percent = Number(point * 100).toFixed(2)
               percent += "%"
-              // $('.schedule').text(percent)
               $("#myModal_add_progressBar").css("width",percent)
             },
             onDownloadProgress(p) {
               // console.log(p)
             }
           }).then(res => {
-            // console.log(res)
             const params = {
               name: _name,
               fileName: ''

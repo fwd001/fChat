@@ -1,7 +1,7 @@
 var router = require('express').Router()
 const multer = require('multer')
 const fs = require('fs')
-const {getJsonFiles} = require('./tool')
+const { getJsonFiles } = require('./tool')
 
 const uploadFolder = 'uploads/'
 // 通过 filename 属性定制
@@ -19,8 +19,7 @@ var storage = multer.diskStorage({
 // 通过 storage 选项来对 上传行为 进行定制化
 var upload = multer({ storage: storage })
 
-//获取所有的新闻接口：
-//localhost:9999/getNewsList : 可以获取到所有的新闻
+//获取所有的文件下载列表
 router.get('/fileList', function(req, res) {
   const list = getJsonFiles()
   //获取到所有的新闻的数据，把数据响应给浏览器
@@ -30,13 +29,16 @@ router.get('/fileList', function(req, res) {
     data: list
   })
 })
+
+// 上传文件
 router.post('/test', upload.single('file'), function(req, res, next) {
   let file = req.file
-  console.log(file.filename)
+  // console.log(file.filename)
   newFileName = file.filename
   res.json({ message: 'ok' })
 })
 
+// 下载
 router.get('/download', function(req, res, next) {
   const name = req.query.name
   const downName = name.split('***')[1]
@@ -50,6 +52,25 @@ router.get('/download', function(req, res, next) {
     'Content-Disposition': `attachment; filename=${encodeURI(downName)}`
   })
   f.pipe(res)
+})
+
+// 删除文件
+router.get('/del', function(req, res) {
+  console.log(req.query)
+  fs.unlink(`${__dirname}/uploads/${req.query.name}`, function(err) {
+    const list = getJsonFiles()
+    const data = {data: list}
+    if (err) {
+      data.code = 500
+      data.msg = '删除失败'
+    } else {
+      data.code = 200
+      data.msg = '删除成功'
+    }
+    res.send(data)
+  })
+
+  //获取到所有的新闻的数据，把数据响应给浏览器
 })
 
 module.exports = router
