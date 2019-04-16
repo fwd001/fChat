@@ -1,6 +1,7 @@
 var router = require('express').Router()
 const multer = require('multer')
 const fs = require('fs')
+const db = require('./db')
 const { getJsonFiles } = require('./tool')
 
 const uploadFolder = 'uploads/'
@@ -72,6 +73,17 @@ router.get('/del', function(req, res) {
   })
 
   //获取到所有的新闻的数据，把数据响应给浏览器
+})
+
+router.get('/deleteAllChat', (req, res) => {
+  db.deleteAll(() => {
+    // console.log('删除成功')
+    res.send({
+      code: 200,
+      msg: '删除成功',
+      data: {}
+    })
+  })
 })
 
 module.exports = router

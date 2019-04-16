@@ -4,6 +4,7 @@ const server = require('http').createServer(app)
 const io = require('socket.io').listen(server) //引入socket.io模块并绑定到服务器
 const router = require('./router')
 let users = []
+const db = require('./db')
 
 global.newFileName = ''
 
@@ -38,8 +39,12 @@ io.sockets.on('connection', function(socket) {
       //socket.userIndex = users.length;
       socket.nickname = nickname
       users.push(nickname)
-      socket.emit('loginSuccess')
+      // socket.emit('loginSuccess')
       io.sockets.emit('system', nickname, users.length, 'login')
+      db.findAllChat((allChat) => {
+        // console.log(allChat);
+        socket.emit('loginSuccess', allChat)
+      })
     }
   })
 
@@ -51,6 +56,7 @@ io.sockets.on('connection', function(socket) {
       ...data,
       date
     }
+    db.addOneChat(response, () => {console.log("插入数据库成功");})
     io.sockets.emit('new message', response)
   })
 
