@@ -4,7 +4,13 @@ const server = require('http').createServer(app)
 const io = require('socket.io').listen(server) //引入socket.io模块并绑定到服务器
 const router = require('./router')
 let users = []
-const db = require('./db')
+// const db = require('./db')
+const db = require('./jsonStore')
+const { delDir } = require('./tool')
+
+let chatList = []
+const port = 23333
+
 
 global.newFileName = ''
 
@@ -19,7 +25,7 @@ app.use(function(req, res, next) {
 
 app.use(router)
 
-server.listen(9999)
+server.listen(port,function() {console.log('服务器启动了：' + port)})
 
 io.sockets.on('connection', function(socket) {
   // 用户离开
@@ -33,6 +39,7 @@ io.sockets.on('connection', function(socket) {
 
   // 用户登陆
   socket.on('login', function(nickname) {
+    console.log(nickname);
     if (users.indexOf(nickname) > -1) {
       socket.emit('nickExisted')
     } else {
@@ -56,8 +63,10 @@ io.sockets.on('connection', function(socket) {
       ...data,
       date
     }
-    db.addOneChat(response, () => {console.log("插入数据库成功");})
     io.sockets.emit('new message', response)
+    // db.addOneChat(response, () => {console.log("插入数据库成功");})
+    chatList.push(response)
+    console.log(chatList);
   })
 
   // 上传文件出发
@@ -70,3 +79,10 @@ io.sockets.on('connection', function(socket) {
     io.sockets.emit('fup file', params)
   })
 })
+
+setInterval(() => {
+  if (chatList.length > 0) {
+    db.addMoreChat(chatList, () => {console.log("插入数据库成功");})
+    chatList = []
+  }
+}, 10000)

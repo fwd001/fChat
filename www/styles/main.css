@@ -4,7 +4,7 @@ html, body {
     font-family: sans-serif;
 }
 .wrapper {
-    width: 500px;
+    /* width: 500px; */
     /* height: 640px; */
     padding: 5px;
     margin: 0 auto;
@@ -46,13 +46,18 @@ html, body {
     transform: translateX(-50%);
 }
 #nicknameInput {
-    width: 250px;
     margin: 0 auto;
     float: left;
 }
 #loginBtn {
     margin-left: 20px;
     float: left;
+}
+@media (max-width: 575px) { 
+    #loginBtn {
+        margin-left: 0px;
+        margin-top: 5px;
+    }
 }
 .chatBox {
     overflow: hidden;
