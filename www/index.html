@@ -1,307 +1,283 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-		<meta name="author" content="Wayou" />
-		<meta name="description" content="chat" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>chat</title>
-		<link rel="stylesheet" href="./styles/bootstrap.css" />
-		<link rel="stylesheet" href="./styles/main.css" />
-		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-		<style>
-			#loginBtn {
-				cursor: pointer;
-			}
-			.flie-link {
-				position: fixed;
-				top: 10px;
-				right: 20px;
-			}
-		</style>
-	</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="author" content="Wayou" />
+    <meta name="description" content="chat" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>chat</title>
+    <link rel="stylesheet" href="./styles/bootstrap.css" />
+    <link rel="stylesheet" href="./styles/main.css" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <style>
+      #loginBtn {
+        cursor: pointer;
+      }
+    </style>
+  </head>
 
-	<body>
-		<div class="wrapper col-xs-12 col-sm-8 col-md-6 col-lg-4">
-			<div><span class="onLine">--</span>人在线</div>
-			<div class="contentBox" id="contentBox">
-				<div></div>
-			</div>
-			<div style="margin-top: 10px;">
-				<button id="fileBtn">文件</button>
-				<input
-					style="display: none;"
-					type="file"
-					name="file"
-					id="file"
-				/>
-				<input
-					id="colorStyle"
-					type="color"
-					placeHolder="#000"
-					title="文字颜色"
-				/>
-				<a href="/fileManage.html" class="btn btn-link btn-sm"
-					>文件箱</a
-				>
-				<!-- 清除记录 -->
-				<!-- <a href="javascript:;" class="btn btn-link btn-sm deleteAllChat">清除记录</a> -->
+  <body>
+    <div class="wrapper col-xs-12 col-sm-8 col-md-6 col-lg-4">
+      <div><span class="onLine">--</span>人在线</div>
+      <div class="contentBox" id="contentBox">
+        <div></div>
+      </div>
+      <div style="margin-top: 10px">
+        <button id="fileBtn">文件</button>
+        <input style="display: none" type="file" name="file" id="file" />
+        <input
+          id="colorStyle"
+          type="color"
+          placeholder="#000"
+          title="文字颜色"
+        />
+        <a href="/fileManage.html" class="btn btn-link btn-sm" target="_blank">
+          文件箱
+        </a>
+        <!-- 清除记录 -->
+        <!-- <a href="javascript:;" class="btn btn-link btn-sm deleteAllChat">清除记录</a> -->
 
-				<div class="progress" id="progress" style="display: none">
-					<div
-						class="progress-bar"
-						id="myModal_add_progressBar"
-						role="progressbar"
-						aria-valuemin="0"
-						aria-valuemax="100"
-						aria-valuenow="0"
-						style="width:0;"
-					></div>
-					<!-- <span class="schedule">0.00%</span> -->
-				</div>
-			</div>
-			<div class="sendBox">
-				<textarea
-					class="form-control"
-					id="Textarea"
-					rows="3"
-				></textarea>
-				<button type="button" id="sendBtn" class="btn btn-primary">
-					发送
-				</button>
-			</div>
-		</div>
-		<a class="flie-link" href="/fileManage.html" target="_blank">文件列表</a>
-		<!-- 输入名字 -->
-		<div id="loginWrapper">
-			<p id="info">正在连接服务器中...</p>
-			<div id="nickWrapper">
-				<input
-					type="text"
-					placeHolder="昵称"
-					id="nicknameInput"
-					class="col-xs-4 col-sm-8 form-control"
-				/>
-				<a id="loginBtn" class="btn btn-primary col-xs-4 col-sm-2">OK</a>
-				<!-- <input type="button" value="发射" id='loginBtn'> -->
-				<!-- <button id="loginBtn">发射</button> -->
-			</div>
-		</div>
-		<script src="./scripts/jquery.min.js"></script>
-		<script src="./scripts/bootstrap.js"></script>
-		<script src="./scripts/axios.js"></script>
-		<script src="./scripts/moment.js"></script>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="scripts/script.js"></script>
-		<script>
-			// Notification.requestPermission().then(permission => {
-			// 	console.log(permission)
-			// })
-			function newInfo(data) {
-				title = data.title || '新的消息'
-				options = {
-					body: data.body + '说：',
-					icon: './favicon.ico'
-				}
-				if (window.Notification) {
-					return new Notification(title, options)
-				}
-			}
-			// axios初始化配置
-			axios.create({
-				withCredentials: true,
-				headers: {
-					'X-Requested-With': 'XMLHttpRequest'
-				},
-				onUploadProgress: p => {
-					return 100 * (p.loaded / p.total)
-				},
-				onDownloadProgress: p => {
-					return 100 * (p.loaded / p.total)
-				}
-			})
-			$(function() {
-				const socket = io.connect()
-				const _contentBox = $('#contentBox')
-				const _textarea = $('#Textarea')
-				const _color = $('#colorStyle')
-				const _progress = $('#progress')
+        <div class="progress" id="progress" style="display: none">
+          <div
+            class="progress-bar"
+            id="myModal_add_progressBar"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+            style="width: 0"
+          ></div>
+          <!-- <span class="schedule">0.00%</span> -->
+        </div>
+      </div>
+      <div class="sendBox">
+        <textarea class="form-control" id="Textarea" rows="3"></textarea>
+        <button type="button" id="sendBtn" class="btn btn-primary">发送</button>
+      </div>
+    </div>
+    <!-- 输入名字 -->
+    <div id="loginWrapper">
+      <p id="info">正在连接服务器中...</p>
+      <div id="nickWrapper">
+        <input
+          type="text"
+          placeholder="昵称"
+          id="nicknameInput"
+          class="col-xs-4 col-sm-8 form-control"
+        />
+        <a id="loginBtn" class="btn btn-primary col-xs-4 col-sm-2">OK</a>
+        <!-- <input type="button" value="发射" id='loginBtn'> -->
+        <!-- <button id="loginBtn">发射</button> -->
+      </div>
+    </div>
+    <script src="./scripts/jquery.min.js"></script>
+    <script src="./scripts/bootstrap.js"></script>
+    <script src="./scripts/axios.js"></script>
+    <script src="./scripts/moment.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="scripts/script.js"></script>
+    <script>
+      // Notification.requestPermission().then(permission => {
+      // 	console.log(permission)
+      // })
+      function newInfo(data) {
+        title = data.title || "新的消息";
+        options = {
+          body: data.body + "说：",
+          icon: "./favicon.ico",
+        };
+        if (window.Notification) {
+          return new Notification(title, options);
+        }
+      }
+      // axios初始化配置
+      axios.create({
+        withCredentials: true,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        onUploadProgress: (p) => {
+          return 100 * (p.loaded / p.total);
+        },
+        onDownloadProgress: (p) => {
+          return 100 * (p.loaded / p.total);
+        },
+      });
+      $(function () {
+        const socket = io.connect();
+        const _contentBox = $("#contentBox");
+        const _textarea = $("#Textarea");
+        const _color = $("#colorStyle");
+        const _progress = $("#progress");
 
-				const _send = $('#sendBtn')
-				const _ok = $('#loginBtn')
-				const _nameInput = $('#nicknameInput')
-				const _online = $('.onLine')
-				const _fileBtn = $('#fileBtn')
-				const _file = $('#file')
-				const _deleteAllChat = $('.deleteAllChat')
+        const _send = $("#sendBtn");
+        const _ok = $("#loginBtn");
+        const _nameInput = $("#nicknameInput");
+        const _online = $(".onLine");
+        const _fileBtn = $("#fileBtn");
+        const _file = $("#file");
+        const _deleteAllChat = $(".deleteAllChat");
 
-				let _name = 'xxx'
-				// socket.emit('login', _name)
-				// 颜色改变事件
-				const _colorChange = function() {
-					_textarea.css({ color: _color.val() })
-				}
-				// 发送消息
-				const _sendMessage = function() {
-					const _msg = _textarea.val()
-					// console.log(_color);
+        let _name = "xxx";
+        // socket.emit('login', _name)
+        // 颜色改变事件
+        const _colorChange = function () {
+          _textarea.css({ color: _color.val() });
+        };
+        // 发送消息
+        const _sendMessage = function () {
+          const _msg = _textarea.val();
+          // console.log(_color);
 
-					const _sendData = {
-						msg: _msg,
-						name: _name,
-						color: _color.val()
-					}
-					if (_msg) {
-						socket.emit('send message', _sendData)
-					}
-					_textarea.val('').focus()
-				}
-				// send输入框按键事件
-				const _textareaKeydown = function(e) {
-					if (e.keyCode === 13 && (e.ctrlKey || e.metaKey)) {
-						this.value += '\n'
-					} else if (e.keyCode === 13) {
-						e.preventDefault()
-						_send.click()
-					}
-				}
-				const _enterleave = function(name, type, date) {
-					_contentBox.append(`<div  class='chatBox'>
+          const _sendData = {
+            msg: _msg,
+            name: _name,
+            color: _color.val(),
+          };
+          if (_msg) {
+            socket.emit("send message", _sendData);
+          }
+          _textarea.val("").focus();
+        };
+        // send输入框按键事件
+        const _textareaKeydown = function (e) {
+          if (e.keyCode === 13 && (e.ctrlKey || e.metaKey)) {
+            this.value += "\n";
+          } else if (e.keyCode === 13) {
+            e.preventDefault();
+            _send.click();
+          }
+        };
+        const _enterleave = function (name, type, date) {
+          _contentBox.append(`<div  class='chatBox'>
             <span class="system">系统</span>
             <span class="chatDate">(${date}):</span>
             <span class="system">${name} ${type}</span>
-          </div>`)
-				}
-				_ok.on('click', function() {
-					const _n = _nameInput.val()
-					if (_n) {
-						_name = _n
-						socket.emit('login', _n)
-					} else {
-						$('#info').text('请填写昵称！')
-					}
-				})
-				_send.on('click', _sendMessage)
-				_nameInput.on('keydown', function(e) {
-					if (e.keyCode === 13) {
-						e.preventDefault()
-						_ok.click()
-					}
-				})
-				_textarea.on('keydown', _textareaKeydown)
-				_fileBtn.on('click', function() {
-					$(this).attr('disabled', true)
-					$('#myModal_add_progressBar').css('width', 0)
-					_file.click()
-				})
-				_deleteAllChat.on('click', function() {
-					axios.get('/deleteAllChat').then(res => {
-						console.log(res)
-					})
-				})
-				// inputChange上传事件
-				_file.on('change', function() {
-					// console.log(this.files);
-					let formData = new FormData()
-					if (!this.files[0]) return
-					$(_progress).show()
-					let temp = this.files[0]
-					if (temp) {
-						formData.append('file', temp)
-						axios({
-							method: 'post',
-							url: '/test',
-							data: formData,
-							// 上传进度
-							onUploadProgress(p) {
-								var point = p.loaded / p.total
-								var percent = Number(point * 100).toFixed(2)
-								percent += '%'
-								$('#myModal_add_progressBar').css(
-									'width',
-									percent
-								)
-							},
-							onDownloadProgress(p) {
-								// console.log(p)
-							}
-						}).then(res => {
-							const params = {
-								name: _name,
-								fileName: ''
-							}
-							socket.emit('up file', params)
-							_file.val('')
-							setTimeout(() => {
-								$(_progress).fadeOut(1000)
-								setTimeout(() => {
-									_fileBtn.removeAttr('disabled')
-								}, 1000)
-							}, 1000)
-						})
-					}
-				})
-				// 颜色改变
-				_color.on('change', _colorChange)
-				// 有文件上传完成提示
-				socket.on('fup file', function(data) {
-					const date = moment(data.date).format('HH:mm')
-					const downName = data.newFileName.split('---')[1]
-					const _div = $(`<div class='chatBox'>
+          </div>`);
+        };
+        _ok.on("click", function () {
+          const _n = _nameInput.val();
+          if (_n) {
+            _name = _n;
+            socket.emit("login", _n);
+          } else {
+            $("#info").text("请填写昵称！");
+          }
+        });
+        _send.on("click", _sendMessage);
+        _nameInput.on("keydown", function (e) {
+          if (e.keyCode === 13) {
+            e.preventDefault();
+            _ok.click();
+          }
+        });
+        _textarea.on("keydown", _textareaKeydown);
+        _fileBtn.on("click", function () {
+          $(this).attr("disabled", true);
+          $("#myModal_add_progressBar").css("width", 0);
+          _file.click();
+        });
+        _deleteAllChat.on("click", function () {
+          axios.get("/deleteAllChat").then((res) => {
+            console.log(res);
+          });
+        });
+        // inputChange上传事件
+        _file.on("change", function () {
+          // console.log(this.files);
+          let formData = new FormData();
+          if (!this.files[0]) return;
+          $(_progress).show();
+          let temp = this.files[0];
+          if (temp) {
+            formData.append("file", temp);
+            axios({
+              method: "post",
+              url: "/test",
+              data: formData,
+              // 上传进度
+              onUploadProgress(p) {
+                var point = p.loaded / p.total;
+                var percent = Number(point * 100).toFixed(2);
+                percent += "%";
+                $("#myModal_add_progressBar").css("width", percent);
+              },
+              onDownloadProgress(p) {
+                // console.log(p)
+              },
+            }).then((res) => {
+              const params = {
+                name: _name,
+                fileName: "",
+              };
+              socket.emit("up file", params);
+              _file.val("");
+              setTimeout(() => {
+                $(_progress).fadeOut(1000);
+                setTimeout(() => {
+                  _fileBtn.removeAttr("disabled");
+                }, 1000);
+              }, 1000);
+            });
+          }
+        });
+        // 颜色改变
+        _color.on("change", _colorChange);
+        // 有文件上传完成提示
+        socket.on("fup file", function (data) {
+          const date = moment(data.date).format("HH:mm");
+          const downName = data.newFileName.split("---")[1];
+          const _div = $(`<div class='chatBox'>
             <span class="chatName">${data.name}</span>
             <span class="chatDate">(${date}):</span>
-            <span class="chatContent"><a class="btn btn-link btn-sm" href="/download?name=${
-				data.newFileName
-			}" target="_blank">(点击下载)${downName}</a></span>
-          </div>`)
-					_contentBox.append(_div)
-					_contentBox.scrollTop(_contentBox[0].scrollHeight)
-				})
-				socket.on('new message', function(data) {
-					// console.log(data);
-					// console.log(moment(data.date).format('YYYY-MM-DD HH:mm:ss'));
-					const date = moment(data.date).format('HH:mm')
-					const _div = $(`<div class='chatBox'>
+            <span class="chatContent"><a class="btn btn-link btn-sm" href="/download?name=${data.newFileName}" target="_blank">(点击下载)${downName}</a></span>
+          </div>`);
+          _contentBox.append(_div);
+          _contentBox.scrollTop(_contentBox[0].scrollHeight);
+        });
+        socket.on("new message", function (data) {
+          // console.log(data);
+          // console.log(moment(data.date).format('YYYY-MM-DD HH:mm:ss'));
+          const date = moment(data.date).format("HH:mm");
+          const _div = $(`<div class='chatBox'>
             <span class="chatName">${data.name}</span>
             <span class="chatDate">(${date}):</span>
-            <span class="chatContent" style="color: ${data.color}">${
-						data.msg
-					}</span>
-          </div>`)
-					_contentBox.append(_div)
-					_contentBox.scrollTop(_contentBox[0].scrollHeight)
-					newInfo({
-						title: data.msg,
-						body: data.name
-					})
-				})
-				socket.on('nickExisted', function() {
-					$('#info').text('昵称已存在，请选择其他昵称')
-				})
-				socket.on('loginSuccess', function(allChat) {
-					document.title = 'chat | ' + _name
-					$('#loginWrapper').hide()
-					_textarea.focus()
-					let historyChat = ''
-					allChat.forEach(v => {
-						const date = moment(v.date).format('HH:mm')
-						historyChat += `<div class='chatBox'>
+            <span class="chatContent" style="color: ${data.color}">${data.msg}</span>
+          </div>`);
+          _contentBox.append(_div);
+          _contentBox.scrollTop(_contentBox[0].scrollHeight);
+          newInfo({
+            title: data.msg,
+            body: data.name,
+          });
+        });
+        socket.on("nickExisted", function () {
+          $("#info").text("昵称已存在，请选择其他昵称");
+        });
+        socket.on("loginSuccess", function (allChat) {
+          document.title = "chat | " + _name;
+          $("#loginWrapper").hide();
+          _textarea.focus();
+          let historyChat = "";
+          allChat.forEach((v) => {
+            const date = moment(v.date).format("HH:mm");
+            historyChat += `<div class='chatBox'>
             <span class="chatName">${v.name}</span>
             <span class="chatDate">(${date}):</span>
             <span class="chatContent" style="color: ${v.color}">${v.msg}</span>
-          </div>`
-					})
-					_contentBox.append(historyChat)
-					_contentBox.scrollTop(_contentBox[0].scrollHeight)
-				})
-				socket.on('system', function(name, userCount, type) {
-					var msg = type == 'login' ? '进入' : ' 离开'
-					_online.text(userCount)
-					const date = moment(new Date()).format('HH:mm')
-					_enterleave(name, msg, date)
-				})
-			})
-		</script>
-	</body>
+          </div>`;
+          });
+          _contentBox.append(historyChat);
+          _contentBox.scrollTop(_contentBox[0].scrollHeight);
+        });
+        socket.on("system", function (name, userCount, type) {
+          var msg = type == "login" ? "进入" : " 离开";
+          _online.text(userCount);
+          const date = moment(new Date()).format("HH:mm");
+          _enterleave(name, msg, date);
+        });
+      });
+    </script>
+  </body>
 </html>
