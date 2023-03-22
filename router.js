@@ -35,7 +35,7 @@ router.get("/fileList", function (req, res) {
 // 上传文件
 router.post("/update", upload.single("file"), function (req, res, next) {
   let file = req.file;
-
+  newFileName = file.filename
   delOneFile(file.filename);
   res.json({ message: "上传内容24小时后自动删除" });
 });

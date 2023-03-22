@@ -207,7 +207,7 @@
             }).then((res) => {
               const params = {
                 name: _name,
-                fileName: "",
+                fileName: temp.name,
               };
               socket.emit("up file", params);
               _file.val("");
@@ -225,7 +225,7 @@
         // 有文件上传完成提示
         socket.on("fup file", function (data) {
           const date = moment(data.date).format("HH:mm");
-          const downName = data.newFileName.split("---")[1];
+          const downName = data.fileName;
           const _div = $(`<div class='chatBox'>
             <span class="chatName">${data.name}</span>
             <span class="chatDate">(${date}):</span>
