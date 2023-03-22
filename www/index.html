@@ -174,7 +174,6 @@
         });
         _textarea.on("keydown", _textareaKeydown);
         _fileBtn.on("click", function () {
-          $(this).attr("disabled", true);
           $("#myModal_add_progressBar").css("width", 0);
           _file.click();
         });
@@ -185,7 +184,6 @@
         });
         // inputChange上传事件
         _file.on("change", function () {
-          // console.log(this.files);
           let formData = new FormData();
           if (!this.files[0]) return;
           $(_progress).show();
@@ -194,7 +192,7 @@
             formData.append("file", temp);
             axios({
               method: "post",
-              url: "/test",
+              url: "/update",
               data: formData,
               // 上传进度
               onUploadProgress(p) {
